@@ -1,5 +1,7 @@
 package co.aa8y.book.fpinscala
 
+import scala.annotation.tailrec
+
 sealed trait List[+A]
 
 case object Nil extends List[Nothing]
@@ -30,5 +32,29 @@ object List {
           throw new UnsupportedOperationException(s"Cannot drop $n elements from an empty list.")
         case Cons(h, t) => drop(t, n - 1)
       }
+  }
+
+  // Exercise 3.5
+  def dropWhile[A](as: List[A], f: A => Boolean): List[A] = as match {
+    case Nil => throw new UnsupportedOperationException(s"Cannot drop elements from an empty list.")
+    case Cons(h, t) => if (f(h)) dropWhile(t, f) else t
+  }
+
+  def append[A](l: List[A], r: List[A]): List[A] = l match {
+    case Nil => r
+    case Cons(h, t) => Cons(h, append(t, r))
+  }
+
+  // Exercise 3.6
+  def init[A](as: List[A]): List[A] = {
+    @tailrec
+    def loop(as: List[A], acc: List[A]): List[A] = as match {
+      case Nil => acc match {
+        case Nil => throw new UnsupportedOperationException("No element to drop in an empty list.")
+        case _ => acc
+      }
+      case Cons(h, t) => loop(t, append(acc, Cons(h, Nil)))
+    }
+    loop(as, Nil)
   }
 }
