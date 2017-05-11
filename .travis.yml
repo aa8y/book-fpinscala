@@ -3,3 +3,9 @@ scala:
   - 2.12.2
 jdk:
   - oraclejdk8
+notifications:
+  email:
+    recipients:
+      - arun.allamsetty@gmail.com
+    on_success: never 	# default: change
+    on_failure: always 	# default: always
