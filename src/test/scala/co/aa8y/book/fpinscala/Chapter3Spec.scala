@@ -66,25 +66,31 @@ class Chapter3Spec extends FlatSpec {
   }
 
   "dropWhile()" should "stop dropping elements as soon as the criteria is not met." in {
-    assert(dropWhile(List(1, 2, 3, 4), (x: Int) => x % 2 == 1) === List(2, 3, 4))
+    assert(dropWhile(List(1, 2, 3, 4))(_ % 2 == 1) === List(2, 3, 4))
   }
 
   it should "return the same list if the criteria is never met." in {
-    assert(dropWhile(List(1, 2, 3, 4), (x: Int) => x > 10) === List(1, 2, 3, 4))
+    assert(dropWhile(List(1, 2, 3, 4))(_ > 10) === List(1, 2, 3, 4))
   }
 
   it should "return Nil if all elements meet the criteria." in {
-    assert(dropWhile(List(1, 2, 3, 4), (x: Int) => x < 10) === Nil)
+    assert(dropWhile(List(1, 2, 3, 4))(_ < 10) === Nil)
   }
 
-  "setHead()" should "return everything unchanged but the first element." in {
-    assert(setHead(testList, -1) === List(-1, 2, 3, 4))
+  "foldLeft()" should "start folding from left to right." in {
+    assert(foldLeft(List(1f, 2f, 4f), 8f)((acc, x) => acc / x) === 1f)
   }
 
-  it should "throw an exception when invoked on an empty list." in {
-    intercept[UnsupportedOperationException] {
-      setHead(Nil, 10)
-    }
+  it should "return the list reversed when the aggregating function is the list constructor." in {
+    assert(foldLeft(List(1, 2, 3), Nil: List[Int])((acc, x) => Cons(x, acc)) === List(3, 2, 1))
+  }
+
+  "foldRight()" should "start folding from right to left and have the same result as foldLeft." in {
+    assert(foldRight(List(1f, 2f, 4f), 8f)((x, acc) => acc / x) === 1f)
+  }
+
+  it should "return the same list back when the aggregating function is the list constructor." in {
+    assert(foldRight(List(1, 2, 3), Nil: List[Int])(Cons(_, _)) === List(1, 2, 3))
   }
 
   "init()" should "return all but the last element in the list." in {
@@ -107,12 +113,53 @@ class Chapter3Spec extends FlatSpec {
     }
   }
 
+  "length()" should "return the size of the list." in {
+    assert(length(List(1, 2, 3)) === 3)
+    assert(length(Nil) === 0)
+  }
+
+  "productLeft()" should "compute the product of all the numbers in the list." in {
+    assert(productLeft(List(2d, 3d, 4d)) === 24d)
+    assert(productLeft(List(2d, 0d, 4d)) === 0d)
+  }
+
+  it should "return 1.0 for an empty list." in {
+    assert(productLeft(Nil) === 1d)
+  }
+
+  "productRight()" should "compute the product of all the numbers in the list." in {
+    assert(productRight(List(2d, 3d, 4d)) === 24d)
+    assert(productRight(List(2d, 0d, 4d)) === 0d)
+  }
+
+  it should "return 1.0 for an empty list." in {
+    assert(productRight(Nil) === 1d)
+  }
+
   "reverse()" should "reverse the contents of a list." in {
     assert(reverse(List(1, 2, 3, 4)) === List(4, 3, 2, 1))
   }
 
   it should "return Nil for a Nil list." in {
     assert(reverse(Nil) === Nil)
+  }
+
+  "setHead()" should "return everything unchanged but the first element." in {
+    assert(setHead(testList, -1) === List(-1, 2, 3, 4))
+  }
+
+  it should "throw an exception when invoked on an empty list." in {
+    intercept[UnsupportedOperationException] {
+      setHead(Nil, 10)
+    }
+  }
+
+  "sumLeft()" should "compute the sum of all integers in the list." in {
+    assert(sumLeft(List(1, 2, 3)) === 6)
+  }
+
+  it should "return 0 for an empty list." in {
+    assert(sumLeft(Nil) === 0)
   }
 
   "tail()" should "return everything but the first element." in {

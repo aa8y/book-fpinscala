@@ -41,8 +41,8 @@ object List {
   def dropRight[A](as: List[A], n: Int): List[A] = reverse(drop(reverse(as), n))
 
   // Exercise 3.5
-  def dropWhile[A](as: List[A], f: A => Boolean): List[A] = as match {
-    case Cons(h, t) => if (f(h)) dropWhile(t, f) else as
+  def dropWhile[A](as: List[A])(f: A => Boolean): List[A] = as match {
+    case Cons(h, t) if f(h) => dropWhile(t)(f)
     case _ => as
   }
 
@@ -57,14 +57,35 @@ object List {
   // Exercise 3.6
   def init[A](as: List[A]): List[A] = reverse(tail(reverse(as)))
 
-  def reverse[A](as: List[A]): List[A] = {
-    @tailrec
-    def loop(as: List[A], acc: List[A]): List[A] = as match {
-      case Nil => acc
-      case Cons(h, t) => loop(t, Cons(h, acc))
-    }
-    loop(as, Nil)
+  // Listing 3.2
+  def foldRight[A, B](as: List[A], b: B)(f: (A, B) => B): B = as match {
+    case Nil => b
+    case Cons(h, t) => f(h, foldRight(t, b)(f))
   }
+
+  // Exercise 3.7
+  def productRight(as: List[Double]): Double = foldRight(as, 1d) { (acc, x) =>
+    if (x == 0d) 0d else acc * x
+  }
+
+  // Exercise 3.9
+  def length[A](as: List[A]): Int = foldRight(as, 0)((_, acc) => acc + 1)
+
+  // Exercise 3.10
+  @tailrec
+  def foldLeft[A, B](as: List[A], b: B)(f: (B, A) => B): B = as match {
+    case Nil => b
+    case Cons(h, t) => foldLeft(t, f(b, h))(f)
+  }
+
+  // Exercise 3.11a
+  def productLeft(as: List[Double]): Double = foldLeft(as, 1d)(_ * _)
+
+  // Exercise 3.11b
+  def sumLeft(as: List[Int]): Int = foldLeft(as, 0)(_ + _)
+
+  // Exercise 3.12
+  def reverse[A](as: List[A]): List[A] = foldLeft(as, Nil: List[A])((acc, a) => Cons(a, acc))
 
   def last[A](as: List[A]): A = as match {
     case Nil => throw nilNoOp("find the last element of")
